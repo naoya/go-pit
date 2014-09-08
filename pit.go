@@ -93,11 +93,7 @@ type config struct {
 }
 
 func (pit pit) Config() (c config) {
-	m := make(map[interface{}]interface{})
-	pit.configPath.LoadYaml(&m)
-	c = config{
-		Profile: m["profile"].(string),
-	}
+	pit.configPath.LoadYaml(&c)
 	return
 }
 
