@@ -8,10 +8,33 @@ import (
 	"path"
 )
 
+type filePath string
+
+func (f filePath) Read() (data []byte) {
+	data, err := ioutil.ReadFile(string(f))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
+func (f filePath) Write(data []byte, perm os.FileMode) {
+	err := ioutil.WriteFile(string(f), data, perm)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
+func (f filePath) Exists() bool {
+	_, err := os.Stat(string(f))
+	return !os.IsNotExist(err)
+}
+
 type pit struct {
 	directory   string
-	configPath  string
-	profilePath string
+	configPath  filePath
+	profilePath filePath
 }
 
 var instance *pit
@@ -23,13 +46,13 @@ func GetInstance() *pit {
 			directory: d,
 		}
 		instance.SetProfilePath("default")
-		instance.configPath = path.Join(d, "pit.yaml")
+		instance.configPath = filePath(path.Join(d, "pit.yaml"))
 	}
 	return instance
 }
 
 func (pit *pit) SetProfilePath(name string) {
-	pit.profilePath = path.Join(pit.directory, name+".yaml")
+	pit.profilePath = filePath(path.Join(pit.directory, name+".yaml"))
 }
 
 func (pit pit) CurrentProfile() (profile string) {
@@ -43,11 +66,8 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 	pit.SetProfilePath(pit.CurrentProfile())
 
 	// TODO: ファイル無いとき -> {} な pit.profile を作る
-	b, err := ioutil.ReadFile(pit.profilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = yaml.Unmarshal(b, &profile)
+	b := pit.profilePath.Read()
+	err := yaml.Unmarshal(b, &profile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,13 +75,9 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 }
 
 func (pit pit) Config() (profile map[interface{}]interface{}) {
-	b, err := ioutil.ReadFile(pit.configPath)
-
 	// TODO: ファイル無いとき -> {"profile" => "default"} な pit.yaml を作る
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = yaml.Unmarshal(b, &profile)
+	b := pit.configPath.Read()
+	err := yaml.Unmarshal(b, &profile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,13 +92,11 @@ func (pit *pit) UpdateConfig(name string) {
 	c := config{
 		Profile: name,
 	}
-
-	// FIXME: エラー無視してる
-	b, _ := yaml.Marshal(&c)
-	err := ioutil.WriteFile(pit.configPath, b, 0600)
+	b, err := yaml.Marshal(&c)
 	if err != nil {
 		log.Fatal(err)
 	}
+	pit.configPath.Write(b, 0600)
 }
 
 type Profile map[string]string
