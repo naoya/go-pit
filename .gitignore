@@ -1,3 +1,6 @@
+Godeps/Readme
+Godeps/_workspace/
+
 ### https://raw.github.com/github/gitignore/master/go.gitignore
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
