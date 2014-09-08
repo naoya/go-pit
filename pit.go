@@ -111,13 +111,15 @@ func (pit *pit) UpdateConfig(name string) {
 type Profile map[string]string
 
 func Get(name string) (profile Profile) {
+	profile = make(Profile)
 	self := GetInstance()
 	m := self.Load()
 
 	// これもちっとマシに型変換できないのかな...
-	profile = make(Profile)
-	for k, v := range m[name].(map[interface{}]interface{}) {
-		profile[k.(string)] = v.(string)
+	if m[name] != nil {
+		for k, v := range m[name].(map[interface{}]interface{}) {
+			profile[k.(string)] = v.(string)
+		}
 	}
 	return
 }
