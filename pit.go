@@ -9,9 +9,9 @@ import (
 )
 
 type pit struct {
-	directory string
-	config    string
-	profile   string
+	directory   string
+	configPath  string
+	profilePath string
 }
 
 var instance *pit
@@ -22,14 +22,14 @@ func GetInstance() *pit {
 		instance = &pit{
 			directory: d,
 		}
-		instance.SetProfile("default")
-		instance.config = path.Join(d, "pit.yaml")
+		instance.SetProfilePath("default")
+		instance.configPath = path.Join(d, "pit.yaml")
 	}
 	return instance
 }
 
-func (pit *pit) SetProfile(name string) {
-	pit.profile = path.Join(pit.directory, name+".yaml")
+func (pit *pit) SetProfilePath(name string) {
+	pit.profilePath = path.Join(pit.directory, name+".yaml")
 }
 
 func (pit pit) CurrentProfile() (profile string) {
@@ -40,10 +40,10 @@ func (pit pit) CurrentProfile() (profile string) {
 }
 
 func (pit pit) Load() (profile map[interface{}]interface{}) {
-	pit.SetProfile(pit.CurrentProfile())
+	pit.SetProfilePath(pit.CurrentProfile())
 
 	// TODO: ファイル無いとき -> {} な pit.profile を作る
-	b, err := ioutil.ReadFile(pit.profile)
+	b, err := ioutil.ReadFile(pit.profilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 }
 
 func (pit pit) Config() (profile map[interface{}]interface{}) {
-	b, err := ioutil.ReadFile(pit.config)
+	b, err := ioutil.ReadFile(pit.configPath)
 
 	// TODO: ファイル無いとき -> {"profile" => "default"} な pit.yaml を作る
 	if err != nil {
@@ -87,16 +87,17 @@ func Get(name string) (profile Profile) {
 
 func Switch(name string) (prev string) {
 	self := GetInstance()
-	self.SetProfile(name)
-
 	prev = self.CurrentProfile()
+
+	self.SetProfilePath(name)
+
 	c := Config{
 		Profile: name,
 	}
 
 	// FIXME: エラー無視してる
 	b, _ := yaml.Marshal(&c)
-	err := ioutil.WriteFile(self.config, b, 0600)
+	err := ioutil.WriteFile(self.configPath, b, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
