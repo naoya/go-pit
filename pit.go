@@ -63,10 +63,20 @@ func (pit pit) CurrentProfile() (profile string) {
 }
 
 func (pit pit) Load() (profile map[interface{}]interface{}) {
+	if _, err := os.Stat(pit.directory); os.IsNotExist(err) {
+		err = os.MkdirAll(pit.directory, 0700)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	pit.SetProfilePath(pit.CurrentProfile())
 
-	// TODO: ファイル無いとき -> {} な pit.profile を作る
+	if !pit.profilePath.Exists() {
+		pit.profilePath.Write([]byte("---\n"), 0600)
+	}
 	b := pit.profilePath.Read()
+
 	err := yaml.Unmarshal(b, &profile)
 	if err != nil {
 		log.Fatal(err)
@@ -75,7 +85,10 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 }
 
 func (pit pit) Config() (profile map[interface{}]interface{}) {
-	// TODO: ファイル無いとき -> {"profile" => "default"} な pit.yaml を作る
+	if !pit.configPath.Exists() {
+		pit.configPath.Write([]byte("---\nprofile: default\n"), 0600)
+	}
+
 	b := pit.configPath.Read()
 	err := yaml.Unmarshal(b, &profile)
 	if err != nil {
