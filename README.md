@@ -23,4 +23,10 @@ Porting [pit](https://github.com/cho45/pit) to Go
 
 ## Note
 
+- I'm golang newbie, code review welcome
 - It does not support pit.Set() yet
+
+## TODO
+
+- Write document
+- Test
