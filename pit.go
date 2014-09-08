@@ -68,10 +68,24 @@ func (pit pit) Config() (profile map[interface{}]interface{}) {
 	return
 }
 
-type Profile map[string]string
-type Config struct {
+type config struct {
 	Profile string `yaml:profile`
 }
+
+func (pit *pit) UpdateConfig(name string) {
+	c := config{
+		Profile: name,
+	}
+
+	// FIXME: エラー無視してる
+	b, _ := yaml.Marshal(&c)
+	err := ioutil.WriteFile(pit.configPath, b, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+type Profile map[string]string
 
 func Get(name string) (profile Profile) {
 	self := GetInstance()
@@ -88,18 +102,7 @@ func Get(name string) (profile Profile) {
 func Switch(name string) (prev string) {
 	self := GetInstance()
 	prev = self.CurrentProfile()
-
 	self.SetProfilePath(name)
-
-	c := Config{
-		Profile: name,
-	}
-
-	// FIXME: エラー無視してる
-	b, _ := yaml.Marshal(&c)
-	err := ioutil.WriteFile(self.configPath, b, 0600)
-	if err != nil {
-		log.Fatal(err)
-	}
+	self.UpdateConfig(name)
 	return
 }
