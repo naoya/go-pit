@@ -42,7 +42,7 @@ func (pit pit) CurrentProfile() (profile string) {
 func (pit pit) Load() (profile map[interface{}]interface{}) {
 	pit.SetProfile(pit.CurrentProfile())
 
-	// TODO: ファイル無いとき
+	// TODO: ファイル無いとき -> {} な pit.profile を作る
 	b, err := ioutil.ReadFile(pit.profile)
 	if err != nil {
 		log.Fatal(err)
@@ -57,7 +57,7 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 func (pit pit) Config() (profile map[interface{}]interface{}) {
 	b, err := ioutil.ReadFile(pit.config)
 
-	// TODO: ファイル無いとき
+	// TODO: ファイル無いとき -> {"profile" => "default"} な pit.yaml を作る
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,8 +89,7 @@ func Switch(name string) (prev string) {
 	self := GetInstance()
 	self.SetProfile(name)
 
-	config := self.Config()
-	prev = config["profile"].(string)
+	prev = self.CurrentProfile()
 	c := Config{
 		Profile: name,
 	}
