@@ -31,6 +31,13 @@ func (f filePath) Exists() bool {
 	return !os.IsNotExist(err)
 }
 
+func (f filePath) LoadYaml(out interface{}) {
+	err := yaml.Unmarshal(f.Read(), out)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 type pit struct {
 	directory   string
 	configPath  filePath
@@ -56,9 +63,7 @@ func (pit *pit) SetProfilePath(name string) {
 }
 
 func (pit pit) CurrentProfile() (profile string) {
-	self := GetInstance()
-	m := self.Config()
-	profile = m["profile"].(string)
+	profile = GetInstance().Config().Profile
 	return
 }
 
@@ -70,35 +75,30 @@ func (pit pit) Load() (profile map[interface{}]interface{}) {
 		}
 	}
 
-	pit.SetProfilePath(pit.CurrentProfile())
-
-	if !pit.profilePath.Exists() {
-		pit.profilePath.Write([]byte("---\n"), 0600)
-	}
-	b := pit.profilePath.Read()
-
-	err := yaml.Unmarshal(b, &profile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return
-}
-
-func (pit pit) Config() (profile map[interface{}]interface{}) {
 	if !pit.configPath.Exists() {
 		pit.configPath.Write([]byte("---\nprofile: default\n"), 0600)
 	}
 
-	b := pit.configPath.Read()
-	err := yaml.Unmarshal(b, &profile)
-	if err != nil {
-		log.Fatal(err)
+	pit.SetProfilePath(pit.CurrentProfile())
+
+	if !pit.profilePath.Exists() {
+		pit.profilePath.Write([]byte("--- {}\n"), 0600)
 	}
+	pit.profilePath.LoadYaml(&profile)
 	return
 }
 
 type config struct {
 	Profile string `yaml:profile`
+}
+
+func (pit pit) Config() (c config) {
+	m := make(map[interface{}]interface{})
+	pit.configPath.LoadYaml(&m)
+	c = config{
+		Profile: m["profile"].(string),
+	}
+	return
 }
 
 func (pit *pit) UpdateConfig(name string) {
