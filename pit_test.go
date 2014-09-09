@@ -1,6 +1,7 @@
-package pit
+package pit_test
 
 import (
+	"github.com/naoya/go-pit"
 	"io/ioutil"
 	"os"
 	"path"
@@ -24,7 +25,7 @@ func TestGet(t *testing.T) {
 	}
 
 	// Test initialization
-	conf := Get("twitter.com")
+	conf := pit.Get("twitter.com")
 	if conf["username"] != "" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
@@ -40,7 +41,7 @@ twitter.com:
 		t.Error(err)
 	}
 
-	conf = Get("twitter.com")
+	conf = pit.Get("twitter.com")
 	if conf["username"] != "melody" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
@@ -56,16 +57,16 @@ twitter.com:
 		t.Error(err)
 	}
 
-	Switch("development")
-	conf = Get("twitter.com")
+	pit.Switch("development")
+	conf = pit.Get("twitter.com")
 
 	if conf["username"] != "development" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
 
 	// Test switch back to default
-	Switch("default")
-	conf = Get("twitter.com")
+	pit.Switch("default")
+	conf = pit.Get("twitter.com")
 
 	if conf["username"] != "melody" {
 		t.Errorf("unexpected result: %s", conf["username"])
