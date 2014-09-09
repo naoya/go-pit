@@ -30,5 +30,5 @@ Porting [pit](https://github.com/cho45/pit) to Go
 
 ## TODO
 
-- Write document
-- Test
+- Need more documents
+
