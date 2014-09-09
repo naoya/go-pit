@@ -23,7 +23,7 @@ func TestGet(t *testing.T) {
 
 	conf := Get("twitter.com")
 	if conf["username"] != "" {
-		t.Error("unexpected result: %s", conf["username"])
+		t.Errorf("unexpected result: %s", conf["username"])
 	}
 
 	data := `--- 
@@ -38,6 +38,6 @@ twitter.com:
 
 	conf = Get("twitter.com")
 	if conf["username"] != "melody" {
-		t.Error("unexpected result: %s", conf["username"])
+		t.Errorf("unexpected result: %s", conf["username"])
 	}
 }
