@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestHello(t *testing.T) {
+func TestGet(t *testing.T) {
 	d, err := ioutil.TempDir("", "")
 	if err != nil {
 		t.Error(err)
