@@ -14,7 +14,9 @@ func TestGet(t *testing.T) {
 	}
 
 	defer func() {
-		os.Remove(d)
+		if err := os.RemoveAll(d); err != nil {
+			t.Error(err)
+		}
 	}()
 
 	if err := os.Setenv("HOME", d); err != nil {
