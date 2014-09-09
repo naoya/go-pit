@@ -62,4 +62,12 @@ twitter.com:
 	if conf["username"] != "development" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
+
+	// Test switch back to default
+	Switch("default")
+	conf = Get("twitter.com")
+
+	if conf["username"] != "melody" {
+		t.Errorf("unexpected result: %s", conf["username"])
+	}
 }
