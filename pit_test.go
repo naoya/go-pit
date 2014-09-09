@@ -1,6 +1,7 @@
 package pit_test
 
 import (
+	"fmt"
 	"github.com/naoya/go-pit"
 	"io/ioutil"
 	"os"
@@ -71,4 +72,18 @@ twitter.com:
 	if conf["username"] != "melody" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
+}
+
+func Example() {
+	// Read account information from ~/.pit/default.yaml
+	conf := pit.Get("twitter.com")
+	fmt.Printf(conf["username"])
+	fmt.Printf(conf["password"])
+
+	// Switch profile to development, now using ~/.pit/development.yaml
+	pit.Switch("development")
+	conf = pit.Get("twitter.com")
+
+	// Switch back to default profile
+	pit.Switch("default")
 }
