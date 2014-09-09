@@ -23,11 +23,13 @@ func TestGet(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Test initialization
 	conf := Get("twitter.com")
 	if conf["username"] != "" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
 
+	// Test default profile
 	data := `--- 
 twitter.com:
   username: melody
@@ -40,6 +42,24 @@ twitter.com:
 
 	conf = Get("twitter.com")
 	if conf["username"] != "melody" {
+		t.Errorf("unexpected result: %s", conf["username"])
+	}
+
+	// Test Switch()
+	data = `
+twitter.com:
+  username: development
+  password: barbaz
+`
+
+	if err := ioutil.WriteFile(path.Join(d, ".pit", "development.yaml"), []byte(data), 0644); err != nil {
+		t.Error(err)
+	}
+
+	Switch("development")
+	conf = Get("twitter.com")
+
+	if conf["username"] != "development" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
 }
