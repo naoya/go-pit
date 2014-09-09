@@ -1,3 +1,9 @@
+/*
+Package pit is the main interface to the Go version of pit.
+
+pit is simple account management tool by ruby, perl or something.
+You can see more detail on ruby version: https://github.com/cho45/pit
+*/
 package pit
 
 import (
@@ -110,6 +116,7 @@ func (pit *pit) UpdateConfig(name string) {
 
 type Profile map[string]string
 
+// Get retrieves account information saved under ~/.pit directory. Default profile is ~/.pit/default.yaml
 func Get(name string) (profile Profile) {
 	profile = make(Profile)
 	self := GetInstance()
@@ -124,6 +131,7 @@ func Get(name string) (profile Profile) {
 	return
 }
 
+// Switch profile to specified name.
 func Switch(name string) (prev string) {
 	self := GetInstance()
 	prev = self.CurrentProfile()
