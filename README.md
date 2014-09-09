@@ -1,5 +1,7 @@
 # go-pit
 
+[![wercker status](https://app.wercker.com/status/80053fce485b48b7cfe2f2e9e8ba01bd/m "wercker status")](https://app.wercker.com/project/bykey/80053fce485b48b7cfe2f2e9e8ba01bd)
+
 ## SYNOPSYS
 
 ```
