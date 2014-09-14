@@ -9,27 +9,18 @@ package pit
 import (
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 )
 
 type filePath string
 
-func (f filePath) Read() (data []byte) {
-	data, err := ioutil.ReadFile(string(f))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return
+func (f filePath) Read() (data []byte, err error) {
+	return ioutil.ReadFile(string(f))
 }
 
-func (f filePath) Write(data []byte, perm os.FileMode) {
-	err := ioutil.WriteFile(string(f), data, perm)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return
+func (f filePath) Write(data []byte, perm os.FileMode) (err error) {
+	return ioutil.WriteFile(string(f), data, perm)
 }
 
 func (f filePath) Exists() bool {
@@ -37,11 +28,9 @@ func (f filePath) Exists() bool {
 	return !os.IsNotExist(err)
 }
 
-func (f filePath) LoadYaml(out interface{}) {
-	err := yaml.Unmarshal(f.Read(), out)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (f filePath) LoadYaml(out interface{}) (err error) {
+	b, err := f.Read()
+	return yaml.Unmarshal(b, out)
 }
 
 type pit struct {
@@ -73,11 +62,11 @@ func (pit pit) CurrentProfile() (profile string) {
 	return
 }
 
-func (pit pit) Load() (profile map[interface{}]interface{}) {
-	if _, err := os.Stat(pit.directory); os.IsNotExist(err) {
+func (pit pit) Load() (profile map[interface{}]interface{}, err error) {
+	if _, e := os.Stat(pit.directory); os.IsNotExist(e) {
 		err = os.MkdirAll(pit.directory, 0700)
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 	}
 
@@ -103,24 +92,29 @@ func (pit pit) Config() (c config) {
 	return
 }
 
-func (pit *pit) UpdateConfig(name string) {
+func (pit *pit) UpdateConfig(name string) (err error) {
 	c := config{
 		Profile: name,
 	}
 	b, err := yaml.Marshal(&c)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	pit.configPath.Write(b, 0600)
+	return
 }
 
 type Profile map[string]string
 
 // Get retrieves account information saved under ~/.pit directory. Default profile is ~/.pit/default.yaml
-func Get(name string) (profile Profile) {
+func Get(name string) (profile Profile, err error) {
 	profile = make(Profile)
 	self := GetInstance()
-	m := self.Load()
+	m, err := self.Load()
+
+	if err != nil {
+		return
+	}
 
 	// これもちっとマシに型変換できないのかな...
 	if m[name] != nil {
@@ -132,10 +126,10 @@ func Get(name string) (profile Profile) {
 }
 
 // Switch profile to specified name.
-func Switch(name string) (prev string) {
+func Switch(name string) (prev string, err error) {
 	self := GetInstance()
 	prev = self.CurrentProfile()
 	self.SetProfilePath(name)
-	self.UpdateConfig(name)
+	err = self.UpdateConfig(name)
 	return
 }

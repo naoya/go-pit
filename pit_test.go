@@ -26,7 +26,7 @@ func TestGet(t *testing.T) {
 	}
 
 	// Test initialization
-	conf := pit.Get("twitter.com")
+	conf, _ := pit.Get("twitter.com")
 	if conf["username"] != "" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
@@ -42,7 +42,7 @@ twitter.com:
 		t.Error(err)
 	}
 
-	conf = pit.Get("twitter.com")
+	conf, err = pit.Get("twitter.com")
 	if conf["username"] != "melody" {
 		t.Errorf("unexpected result: %s", conf["username"])
 	}
@@ -59,7 +59,7 @@ twitter.com:
 	}
 
 	pit.Switch("development")
-	conf = pit.Get("twitter.com")
+	conf, _ = pit.Get("twitter.com")
 
 	if conf["username"] != "development" {
 		t.Errorf("unexpected result: %s", conf["username"])
@@ -67,7 +67,7 @@ twitter.com:
 
 	// Test switch back to default
 	pit.Switch("default")
-	conf = pit.Get("twitter.com")
+	conf, _ = pit.Get("twitter.com")
 
 	if conf["username"] != "melody" {
 		t.Errorf("unexpected result: %s", conf["username"])
@@ -76,13 +76,19 @@ twitter.com:
 
 func Example() {
 	// Read account information from ~/.pit/default.yaml
-	conf := pit.Get("twitter.com")
+	conf, err := pit.Get("twitter.com")
+	if err != nil {
+		return
+	}
 	fmt.Printf(conf["username"])
 	fmt.Printf(conf["password"])
 
 	// Switch profile to development, now using ~/.pit/development.yaml
 	pit.Switch("development")
-	conf = pit.Get("twitter.com")
+	conf, err = pit.Get("twitter.com")
+	if err != nil {
+		return
+	}
 
 	// Switch back to default profile
 	pit.Switch("default")
