@@ -7,9 +7,13 @@
 ```
 import(
   "github.com/naoya/go-pit"
+  "log"
 )
 
-config := pit.Get("twitter.com")
+config, err := pit.Get("twitter.com")
+if err != nil {
+  log.Fatal(err)
+}
 
 username := config["username"]
 password := config["password"]
