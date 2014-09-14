@@ -19,8 +19,12 @@ username := config["username"]
 password := config["password"]
 
 // switch to another profile
-pit.Switch("development")
-config = pit.Get("twitter.com")
+err = pit.Switch("development")
+if err != nil {
+  log.Fatal(err)
+}
+
+config, err = pit.Get("twitter.com")
 ```
 
 ## Description
