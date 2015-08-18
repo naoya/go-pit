@@ -5,7 +5,7 @@ import (
 	"github.com/naoya/go-pit"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 )
 
@@ -38,7 +38,7 @@ twitter.com:
   password: nelson
 `
 
-	if err := ioutil.WriteFile(path.Join(d, ".pit", "default.yaml"), []byte(data), 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(d, ".pit", "default.yaml"), []byte(data), 0644); err != nil {
 		t.Error(err)
 	}
 
@@ -54,7 +54,7 @@ twitter.com:
   password: barbaz
 `
 
-	if err := ioutil.WriteFile(path.Join(d, ".pit", "development.yaml"), []byte(data), 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(d, ".pit", "development.yaml"), []byte(data), 0644); err != nil {
 		t.Error(err)
 	}
 
