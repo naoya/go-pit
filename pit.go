@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"path/filepath"
 )
 
@@ -43,7 +44,15 @@ var instance *pit
 
 func GetInstance() *pit {
 	if instance == nil {
-		d := path.Join(os.Getenv("HOME"), ".pit")
+		d := os.Getenv("HOME")
+		if d == "" {
+			usr, err := user.Current()
+			if err != nil {
+				panic(err)
+			}
+			d = usr.HomeDir
+		}
+		d = filepath.Join(d, ".pit")
 		instance = &pit{
 			directory: d,
 		}
