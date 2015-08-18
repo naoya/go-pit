@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type filePath string
@@ -48,13 +48,13 @@ func GetInstance() *pit {
 			directory: d,
 		}
 		instance.SetProfilePath("default")
-		instance.configPath = filePath(path.Join(d, "pit.yaml"))
+		instance.configPath = filePath(filepath.Join(d, "pit.yaml"))
 	}
 	return instance
 }
 
 func (pit *pit) SetProfilePath(name string) {
-	pit.profilePath = filePath(path.Join(pit.directory, name+".yaml"))
+	pit.profilePath = filePath(filepath.Join(pit.directory, name+".yaml"))
 }
 
 func (pit pit) CurrentProfile() (profile string) {
